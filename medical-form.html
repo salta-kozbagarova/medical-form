@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <script src="jquery-3.3.1.min.js"></script>
+</head>
+<body>
+    <style>
+        .container {
+            width: 800px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .cutter {
+            width: 800px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .container div {
+            border: 1px solid black;
+            position: absolute;
+            font-size: 12px;
+        }
+
+        .header {
+            border: none !important;
+            width: 100%;
+        }
+
+        .service-head {
+            border: none !important;
+            width: 100%;
+        }
+
+        .services {
+            border: none !important;
+            width: 100%;
+        }
+
+        .services table {
+            border: 1px solid black;
+            position: absolute;
+            font-size: 11px;
+            border-collapse: collapse;
+        }
+
+        .services td {
+            border: 1px solid black;
+            margin: 0 0;
+        }
+
+        .services .article {
+            width: 90px;
+        }
+
+        .services .name {
+            width: 284px;
+        }
+
+        .services .article div {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            left: 10px;
+            position: relative;
+        }
+
+        .services .article p {
+            display: inline-block;
+            position: relative;
+            left: 10px;
+            margin: 0 0;
+            padding: 0 0;
+        }
+
+        .title {
+            width: 100%;
+            background-color: #afafaf;
+        }
+
+        .footer {
+            border: none !important;
+        }
+
+        .summary {
+            width: 800px;
+            position: relative !important;
+            margin: 0 auto;
+            height: 30px;
+            border: none !important;
+        }
+
+        .summary table {
+            top: 5px;
+            border: 1px solid black;
+            font-size: 13px;
+            border-collapse: collapse;
+            width: 803px;
+            font-weight: bold;
+            position: absolute;
+        }
+
+        .summary td {
+            border: 1px solid black;
+            margin: 0 0;
+        }
+
+        .summary span {
+            padding-left: 5px;
+        }
+
+        .confirmation {
+            border: none !important;
+            width: 800px;
+            position: relative !important;
+            margin: 0 auto;
+            font-size: 11px !important;
+        }
+
+        .confirmation .check {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            left: 10px;
+            position: relative !important;
+            border: 1px solid black;
+            margin-right: 20px;
+        }
+
+        .confirmation span {
+            display: inline-block;
+        }
+
+        @media print {
+            .title {
+                width: 100%;
+                background-color: #afafaf;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+        @page {
+            margin: 0.5cm;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            var nodes = $('body').children();
+            var containerArr = $('.container');
+            var cutterArr = $('.cutter');
+            var contInd = 0;
+            var cuttInd = 0;
+            var countedHeight;
+            var lastHeight;
+            var tabsPx = 18.897638;
+
+            var _footer = '<div class="footer">' +
+            '<div class="summary">' +
+                '<table>' +
+                    '<tr>' +
+                        '<td><span id="service-count">Количество исследований:  </span></td>' +
+                        '<td><span>Подпись и печать врача:_____________________________</span></td>' +
+                    '</tr>' +
+                '</table>' +
+            '</div>' +
+            '<div class="confirmation">' +
+                '<span><div class="check"></div>' +
+                    'Я информирован и согласен на проведение манипуляций для лабораторных исследований,    обработку моих персональных данных, оплату, сроки выдачи результатов с соблюдением конфиденциальности.<br/>' +
+            'Зертханалық зерттеулер үшін іс-қимылдарды жүргізуге, құпиялылықты сақтай отырып, менің жеке деректерімнің өңделетіндігіне, төлем жүргізуге, нәтижелерді беру мерзімімен хабардар етілдім және келісемін.<br/>' +
+                'I was informed and agree with manipulations related to laboratory research, processing of my personal data, payment, laboratory test execution time and respect of confidentiality' +
+                '</span>' +
+                '<span>(Ф.И.О., дата, роспись) / (Т.Ә.Ж., күні, қолы) / (Full name, date, signature)_____________________________________________________________</span>' +
+            '</div>' +
+        '</div>';
+
+            $('.container').each(function (i, v) {
+                var height = this.scrollHeight;
+                var footer = $(_footer);
+                footer.css('top', height);
+                var serviceCount = footer.find('#service-count');
+                serviceCount.text(serviceCount.text() + $(this).data('service-count'));
+                $(this).append(footer);
+                if (i == 0) {
+                    countedHeight = this.scrollHeight;
+                }
+                $(this).height(this.scrollHeight);
+
+                var fullname = $(this).find('#fullname');
+                var fontSize = parseInt(fullname.css('font-size'));
+                while (fullname.width() > 250) {
+                    fullname.css({ "font-size": --fontSize + "px" });
+                }
+            });
+            $('.cutter').each(function (i, v) {
+                var height = this.scrollHeight + 30;
+                $(this).height(height);
+                $(this).css({ 'line-height': height + 'px' });
+            });
+
+            $.each(nodes, function (i, v) {
+                if ($(v).hasClass('cutter')) {
+                    lastHeight = $(v).height();
+                    cuttInd++;
+                }
+                if ($(v).hasClass('container')) {
+                    if (contInd == 0) {
+                        contInd++;
+                        return;
+                    }
+                    lastHeight += $(v).height();
+                    if ((countedHeight + lastHeight) > 1147) {
+                        var spaceDiv = $('<div></div>');
+                        spaceDiv.css({
+                            'position': 'relative',
+                            'width': '800px',
+                            'margin': '0 auto',
+                            'height': (1147 - countedHeight) + tabsPx
+                        });
+                        console.log(countedHeight);
+                        $(containerArr[contInd - 1]).after(spaceDiv);
+                        $(cutterArr[cuttInd - 1]).remove();
+                        countedHeight = $(v).height();
+                    } else {
+                        countedHeight += lastHeight;
+                    }
+                    contInd++;
+                }
+            });
+        });
+        window.onload = function () {
+            window.print();
+        }
+    </script>
+    <div class="container" data-service-count="5">
+        <div class="header">
+            <div style="width: 300px;height: 17px;top: 0px;left: 0px;font-weight: bold;">
+                <p style="margin: 0 0 0 5px;display: inline-block;">ФИО:</p>
+                <p style="margin: 0 0 0 5px;display: inline-block;" id="fullname">ТЕСТОВОЕ ИМЯ И ФАМИЛИЯ С ОЧЕСТВОМ</p>
+            </div>
+            <div style="width: 300px;height: 28px;top: 18px;left: 0px;font-weight: bold;">
+                <div style="border: none;width: 100%;">
+                    <p style="margin: 0 0 0 2px;display: inline-block;">Дата рождения:</p>
+                    <p style="margin: 0 0 0 0;display: inline-block;" id="birthdate"></p>
+                    <p style="margin: 0 0 0 50px;display: inline-block;">Пол:</p>
+                    <p style="margin: 0 0 0 0;display: inline-block;" id="gender"></p>
+                </div>
+                <div style="border: none;width: 100%;">
+                    <p style="margin: 15px 0 0 2px;display: inline-block;">ИИН:</p>
+                    <p style="margin: 15px 0 0 0;display: inline-block;" id="iin"></p>
+                    <p style="margin: 15px 0 0 20px;display: inline-block;">Контакт тел:</p>
+                    <p style="margin: 15px 0 0 0;display: inline-block;" id="phonenumber"></p>
+                </div>
+            </div>
+            <div style="width: 801px;height: 28px;top: 47px;left: 0px;">
+                <div style="border: none;width: 100%;">
+                    <p style="margin: 0 0 0 2px;display: inline-block;">Отделение:</p>
+                    <p style="margin: 0 0 0 0;display: inline-block;text-decoration: underline;" id="department"></p>
+                    <p style="margin: 0 0 0 5px;display: inline-block;">ФИО врача</p>
+                    <p style="margin: 0 0 0 0;display: inline-block;text-decoration: underline;" id="dtrnam"></p>
+                    <p style="margin: 0 0 0 5px;display: inline-block;text-decoration: underline;">Дата заказа:</p>
+                    <p style="margin: 0 0 0 1px;display: inline-block;" id="odrdte"></p>
+                    <p style="margin: 0 0 0 5px;display: inline-block;">Дата, время сбора образца:</p>
+                    <p style="margin: 0 0 0 1px;display: inline-block;">__________</p>
+                </div>
+                <div style="border: none;width: 100%;">
+                    <p style="margin: 15px 0 0 2px;display: inline-block;">Адрес пациента:</p>
+                    <p style="margin: 15px 0 0 0;display: inline-block;" id="patadr"></p>
+                </div>
+            </div>
+            <div style="width:500px;height: 17px;top: 0px;left: 301px;text-align: center;">
+                <p style="margin: 0 0;font-weight: bold;font-size: 11px;">
+                    "Корпоративный фонд "University Medical Center" "Республиканский диагностический центр"
+                </p>
+            </div>
+            <div style="width:500px;height: 28px;top: 18px;left: 301px;">
+                <p style="font-weight: bold;margin: 0 0 0 130px;font-size: 12px;">Центр лабораторной медицины</p>
+                <span style="font-style: italic;margin: 0 0 0 80px;">010000, Астана ул. Сыганак 2, тел. 8(7172)70-15-67, 70-15-62</span>
+            </div>
+            <div style="width: 300px;height: 13px;top: 76px;left: 0px;">
+                <p style="margin: 0 0 0 2px;display: inline-block;">Категория:</p>
+                <p style="margin: 0 0 0 10px;display: inline-block;" id="paytype"></p>
+            </div>
+            <div style="width: 500px;height: 13px;top: 76px;left: 301px;">
+                <p style="margin: 0 0 0 2px;display: inline-block;">Номер квоты:</p>
+                <div style="display: inline-block;height: 12px;border-right: none;left: 260px;"></div>
+                <div style="display: inline-block;height: 12px;border-right: none;left: 295px;"></div>
+                <div style="display: inline-block;height: 12px;border-right: none;left: 330px;"></div>
+                <div style="display: inline-block;height: 12px;border-right: none;left: 365px;"></div>
+                <div style="display: inline-block;height: 12px;border-right: none;left: 400px;"></div>
+                <div style="display: inline-block;height: 12px;border-right: none;left: 435px;"></div>
+                <div style="display: inline-block;height: 12px;border-right: none;left: 470px;"></div>
+            </div>
+        </div>
+        <div class="service-head">
+            <div class="title" style="width: 801px;height: 30px;top: 90px;left: 0px;">
+                <p style="font-size: 13px;margin: 0px;font-weight: bold;font-style: italic;text-align: center;" id="groupname"></p>
+                <p style="font-size: 10px;margin: 0px;font-style: italic;text-align: center;" id="groupname-info"></p>
+            </div>
+            <div style="width: 801px;height: 60px;top: 121px;left: 0px;">
+                <p style="margin: 0 0 0 5px;display: inline-block;font-style: italic;">Предварительный диагноз:</p>
+                <div style="display: inline-block;height: 58px;border-right: none;left: 200px;"></div>
+                <div style="display: inline-block;height: 58px;border-right: none;left: 210px;"></div>
+                <div style="display: inline-block;height: 25px;border-right: none;left: 240px;"></div>
+                <div style="display: inline-block;height: 25px;border-right: none;left: 270px;"></div>
+                <div style="display: inline-block;height: 42px;border-right: none;left: 300px;"></div>
+                <div style="display: inline-block;height: 25px;border-right: none;left: 330px;"></div>
+                <div style="display: inline-block;height: 25px;border-right: none;left: 360px;"></div>
+                <div style="display: inline-block;height: 58px;border-right: none;left: 390px;"></div>
+                <div style="display: inline-block;width: 179px;border-top: none;left: 210px;top: 26px;"></div>
+                <div style="display: inline-block;width: 179px;border-top: none;left: 210px;top: 43px;"></div>
+                <p style="position: absolute; margin: 32px 0 0 250px;font-size: 11px;font-style: italic;font-weight: bold;">Вклеить штрих-код!</p>
+
+                <div style="display: inline-block;width: 179px;border-top: none;left: 410px;top: 4px;"></div>
+                <div style="display: inline-block;height: 54px;border-right: none;left: 410px;top: 4px;"></div>
+                <div style="display: inline-block;height: 21px;border-right: none;left: 440px;top: 4px;"></div>
+                <div style="display: inline-block;height: 21px;border-right: none;left: 470px;top: 4px;"></div>
+                <div style="display: inline-block;height: 38px;border-right: none;left: 500px;top: 4px;"></div>
+                <div style="display: inline-block;height: 21px;border-right: none;left: 530px;top: 4px;"></div>
+                <div style="display: inline-block;height: 21px;border-right: none;left: 560px;top: 4px;"></div>
+                <div style="display: inline-block;height: 54px;border-right: none;left: 590px;top: 4px;"></div>
+                <div style="display: inline-block;width: 179px;border-top: none;left: 410px;top: 26px;"></div>
+                <div style="display: inline-block;width: 179px;border-top: none;left: 410px;top: 43px;"></div>
+                <p style="position: absolute;margin: 32px 0 0 450px;font-size: 11px;font-style: italic;font-weight: bold;">Вклеить штрих-код!</p>
+            </div>
+        </div>
+        <div class="services">
+            <table style="top: 182px;width: 803px;">
+                <tr>
+                    <td class="article">
+                        <p>B04556478</p>
+                    </td>
+                    <td class="name">
+                        Глюкоза венозной крови
+                    </td>
+                    <td class="article">
+                        <div></div>
+                        <p>B04556478</p>
+                    </td>
+                    <td class="name">
+                        Креатинфосфокиназа(КФК)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="article">
+                        <div></div>
+                        <p>B04556478</p>
+                    </td>
+                    <td class="name">Креатинин</td>
+                    <td class="article">
+                        <div></div>
+                        <p>B04556478</p>
+                    </td>
+                    <td class="name">НЖСС</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!--<p class="cutter">------------------------------------------------------------------------------------------------------------------------------------------------------</p>-->
+</body>
+</html>
